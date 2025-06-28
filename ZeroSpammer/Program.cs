@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Net;
 using System.Text;
-using ZeroSpammer; 
+using ZeroSpammer;
 
 namespace Zero.Main
 {
@@ -9,128 +9,121 @@ namespace Zero.Main
     {
         public static string webhook = "";
         public static utils x = new utils();
+
         public static void Main(string[] args)
         {
+            if (File.Exists("config.ini"))
+            {
+                webhook = File.ReadAllText("config.ini");
+            }
             Console.Title = "Zero Spammer | Loading...";
 #if !DEBUG
-            utils.Intro();
+            utils.logo(true);
 #endif
             Menu();
         }
 
         private static void Menu()
         {
-            Console.Clear();
-            Console.Title = "Zero Spammer | Main Menu";
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("Zero Spammer made in C# for discord | github.com/east-22\n\n");
-            Console.ResetColor();
-
-            if (string.IsNullOrEmpty(webhook))
+            while (true)
             {
-                Console.Write($"Webhook: ");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("No webhook\n"); Console.ResetColor();
-            }
-            else
-            {
-                Console.Write($"Webhook: ");
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("True\n"); Console.ResetColor();
+                Console.Clear();
+                utils.logo(false);
+                Console.Title = "Zero Spammer | Main Menu";
 
-            }
-                
-
-            Console.WriteLine("[1] - Enter webhook\t[2] - Start spamming\t[3] - Open github");
-            Console.Write("-> ");
-            var result = Console.ReadLine();
-
-            if (result == "1")
-            {
-                Console.Write("Enter webhook: ");
-                var entered_webhook = Console.ReadLine();
-                if (entered_webhook.StartsWith("https://discord.com/api/webhooks/"))
-                {
-                    webhook = entered_webhook;
-                    Menu();
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("Invalid webhook!"); Console.ResetColor(); Thread.Sleep(500); Menu();
-                }
-
-            }
-            if (result == "2")
-            {
-                if (!string.IsNullOrEmpty(webhook))
-                {
-                    Spammer();
-                    return;
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("No webhook!");
-                    Console.ResetColor();
-                    Thread.Sleep(500);
-                    Menu();
-                }
-
-            }
-            if (result == "3")
-            {
-                Process.Start("explorer.exe","https://github.com/east-22");
-                Menu();
-            }
-            if (result == string.Empty)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid option!");
+                Console.Write("Webhook: ");
+                Console.ForegroundColor = string.IsNullOrEmpty(webhook) ? ConsoleColor.Red : ConsoleColor.Green;
+                Console.WriteLine(string.IsNullOrEmpty(webhook) ? "No webhook" : "True");
                 Console.ResetColor();
-                Thread.Sleep(500);
-                Menu();
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid option!");
-                Console.ResetColor();
-                Thread.Sleep(500);
-                Menu();
+
+                Console.WriteLine("[1] - Edit webhook\t[2] - Start spamming\t[3] - Open github");
+                Console.Write("-> ");
+                var input = Console.ReadLine();
+
+                switch (input)
+                {
+                    case "1":
+                        Console.Clear();
+                        utils.logo(false);
+                        Console.WriteLine("Enter your webhook URL (must start with https://discord.com/api/webhooks/):");
+                        Console.WriteLine("OR, type 'remove' to remove it");
+                        Console.Write("-> ");
+                        var entered = Console.ReadLine();
+                        if (entered.Equals("remove", StringComparison.OrdinalIgnoreCase))
+                        {
+                            webhook = "";
+                            File.WriteAllText("config.ini", "");
+                            continue;
+                        }
+                        if (entered.StartsWith("https://discord.com/api/webhooks/"))
+                        {
+                            webhook = entered;
+                            File.WriteAllText("config.ini", webhook);
+                        }
+
+                        else
+                        {
+                            Error("Invalid webhook!");
+                            continue;
+                        }
+                        break;
+
+                    case "2":
+                        if (string.IsNullOrEmpty(webhook)) { Error("No webhook!"); continue; }
+                        Spammer();
+                        break;
+
+                    case "3":
+                        Process.Start("explorer.exe","https://github.com/east-22");
+                        break;
+
+                    default:
+                        Error("Invalid option!");
+                        break;
+                }
             }
         }
 
         private static void Spammer()
         {
             Console.Clear();
+            utils.logo(false);
             Console.Title = "Zero Spammer | Spamming...";
 
             Console.Write("Message: ");
-            var message = Console.ReadLine();
+            var msg = Console.ReadLine();
             Console.Write("How many: ");
-            int.TryParse(Console.ReadLine(), out var how_many);
+            int.TryParse(Console.ReadLine(), out var count);
 
             int sent = 0;
-            for (int i = 0; i < how_many; i++)
+            for (int i = 0; i < count; i++)
             {
                 try
                 {
-                    WebClient client = new WebClient();
+                    using var client = new WebClient();
                     client.Headers.Add("Content-Type", "application/json");
-                    string payload = "{\"content\": \"" + message + "\"}";
+                    var payload = "{\"content\": \"" + msg + "\"}";
                     client.UploadData(webhook, Encoding.UTF8.GetBytes(payload));
-                    utils.ConsoleLog($"Sent message {i + 1}/{how_many}", 1);
+                    utils.ConsoleLog($"Sent message {i + 1}/{count}", 1);
                     sent++;
                 }
                 catch
                 {
-                    utils.ConsoleLog($"Didnt sent: {i + 1}/{how_many}", 2);
-                    sent--;
+                    utils.ConsoleLog($"Didn't send: {i + 1}/{count}", 2);
                 }
             }
-            utils.ConsoleLog($"Sent {sent}/{how_many}", 0);
+
+            utils.ConsoleLog($"Sent {sent}/{count}", 0);
             Console.WriteLine("Press any key to continue...");
-            Console.Read();
+            Console.ReadKey();
+        }
+
+        private static void Error(string msg)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(msg);
+            Console.ResetColor();
+            Thread.Sleep(500);
         }
     }
 }
