@@ -2,7 +2,7 @@
 Basic discord webhook spammer made in c#, Made for testing purposes only. Please use responsibly and follow with Discord's Terms of Service.
 
 ## Preview
-![image](https://github.com/user-attachments/assets/0cb8832a-3355-4e2e-9c59-ac4dd6ddad8b)
+![image](https://raw.githubusercontent.com/east-22/ZeroSpammer/refs/heads/main/ZeroSpammer/ZeroSpammer.png)
 ## Features
 * Send multiple messages through a discord webhook
 * Easy to use
