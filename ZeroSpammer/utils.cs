@@ -1,37 +1,67 @@
-﻿namespace ZeroSpammer
+namespace ZeroSpammer
 {
     public class utils
     {
 
-        public static void Intro()
+        public static void logo(bool type)
         {
-            string[] logo = new string[]
+            string[] logo;
+            if (type)
             {
-        "███████╗███████╗██████╗░░█████╗░",
-        "╚════██║██╔════╝██╔══██╗██╔══██╗",
-        "░░███╔═╝█████╗░░██████╔╝██║░░██║",
-        "██╔══╝░░██╔══╝░░██╔══██╗██║░░██║",
-        "███████╗███████╗██║░░██║╚█████╔╝",
-        "╚══════╝╚══════╝╚═╝░░╚═╝░╚════╝░",
-        "Zero Spammer made by east_22",
-            };
+                logo = new string[]
+                {
+                        "███████╗███████╗██████╗░░█████╗░",
+                        "╚════██║██╔════╝██╔══██╗██╔══██╗",
+                        "░░███╔═╝█████╗░░██████╔╝██║░░██║",
+                        "██╔══╝░░██╔══╝░░██╔══██╗██║░░██║",
+                        "███████╗███████╗██║░░██║╚█████╔╝",
+                        "╚══════╝╚══════╝╚═╝░░╚═╝░╚════╝░",
+                        "Zero Spammer made by east_22",
+                };
+            }
+            else
+            {
+                logo = new string[]
+                {
+@"$$$$$$$$\$$$$$$$$\$$$$$$$\  $$$$$$\         $$$$$$\ $$$$$$$\  $$$$$$\ $$\      $$\$$\      $$\$$$$$$$$\$$$$$$$\  ",
+@"\____$$  $$  _____$$  __$$\$$  __$$\       $$  __$$\$$  __$$\$$  __$$\$$$\    $$$ $$$\    $$$ $$  _____$$  __$$\ ",
+@"    $$  /$$ |     $$ |  $$ $$ /  $$ |      $$ /  \__$$ |  $$ $$ /  $$ $$$$\  $$$$ $$$$\  $$$$ $$ |     $$ |  $$ |",
+@"   $$  / $$$$$\   $$$$$$$  $$ |  $$ |      \$$$$$$\ $$$$$$$  $$$$$$$$ $$\$$\$$ $$ $$\$$\$$ $$ $$$$$\   $$$$$$$  |",
+@"  $$  /  $$  __|  $$  __$$<$$ |  $$ |       \____$$\$$  ____/$$  __$$ $$ \$$$  $$ $$ \$$$  $$ $$  __|  $$  __$$<",
+@" $$  /   $$ |     $$ |  $$ $$ |  $$ |      $$\   $$ $$ |     $$ |  $$ $$ |\$  /$$ $$ |\$  /$$ $$ |     $$ |  $$ |",
+@"$$$$$$$$\$$$$$$$$\$$ |  $$ |$$$$$$  |      \$$$$$$  $$ |     $$ |  $$ $$ | \_/ $$ $$ | \_/ $$ $$$$$$$$\$$ |  $$ |",
+@"\________\________\__|  \__|\______/        \______/\__|     \__|  \__\__|     \__\__|     \__\________\__|  \__|",
+""
+                };
+            }
+
+
+            Console.ForegroundColor = ConsoleColor.Red;
 
             int consoleWidth = Console.WindowWidth;
-            int consoleHeight = Console.WindowHeight;
-            int startRow = consoleHeight / 2 - logo.Length / 2;
-            Console.ForegroundColor = ConsoleColor.Red;
+            int startRow = type
+                ? Console.WindowHeight / 2 - logo.Length / 2  // center vertically if animated logo
+                : 2; // print near top when false
+
             foreach (var text in logo)
             {
-                Thread.Sleep(250);
-                int padding = (consoleWidth - text.Length) / 2;
-                Console.SetCursorPosition(0, startRow);
-                Console.WriteLine(new string(' ', padding) + text);
-                startRow++;
+                if (type) Thread.Sleep(250);
+                int padding = Math.Max((consoleWidth - text.Length) / 2, 0);
+                Console.SetCursorPosition(padding, startRow++);
+                Console.WriteLine(text);
             }
+
             Console.ResetColor();
-            Thread.Sleep(1500);
-            Console.Clear();
+
+            if (type)
+            {
+                Thread.Sleep(1500);
+                Console.Clear();
+            }
+
         }
+
+
 
 
 
